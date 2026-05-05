@@ -5,16 +5,16 @@ jobs:
   build:
     runs-on: macos-14
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # Node 24 ব্যবহারের জন্য
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Folders and Tools
+      - name: Install Tools
         run: |
-          mkdir -p GameHub
           brew install xcodegen
+          mkdir -p GameHub
 
-      - name: Generate Entitlements (For JIT & Performance)
+      - name: Generate Entitlements
         run: |
           cat <<EOF > GameHub/GameHub.entitlements
           <?xml version="1.0" encoding="UTF-8"?>
@@ -31,17 +31,22 @@ jobs:
           </plist>
           EOF
 
-      - name: Fix Xcode Format and Generate
-        run: xcodegen generate
-
-      - name: Build Archive
+      - name: Clean and Generate Project
         run: |
+          # পুরনো প্রজেক্ট ফাইল থাকলে ডিলিট করে নতুন করে জেনারেট করা
+          rm -rf GameHub.xcodeproj
+          xcodegen generate
+
+      - name: Build and Archive
+        run: |
+          # সরাসরি Xcode 15.4 পাথ ব্যবহার করে বিল্ড করা
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
           xcodebuild archive -project GameHub.xcodeproj \
           -scheme GameHub -sdk iphoneos17.5 \
           -archivePath GameHub.xcarchive \
           CODE_SIGNING_ALLOWED=NO
 
-      - name: Export IPA for Sideloading
+      - name: Export IPA
         run: |
           mkdir -p Payload
           cp -r GameHub.xcarchive/Products/Applications/GameHub.app Payload/
@@ -50,5 +55,5 @@ jobs:
       - name: Upload Finished IPA
         uses: actions/upload-artifact@v4
         with:
-          name: Sifat-GameHub-Final
+          name: Sifat-GameHub-Final-Build
           path: GameHub.ipa
