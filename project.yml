@@ -1,0 +1,16 @@
+name: GameHub
+options:
+  # এরর ফিক্স: পুরনো Xcode ভার্সনের জন্য ফরম্যাট কমানো হলো
+  xcodeVersion: "15.0" 
+  bundleIdPrefix: com.sifatrabbioffice
+targets:
+  GameHub:
+    type: application
+    platform: iOS
+    # রানারের SDK 17.5 এর সাথে সামঞ্জস্যপূর্ণ করা হয়েছে
+    deploymentTarget: "17.0"
+    sources: [GameHub]
+    settings:
+      ENABLE_BITCODE: NO
+      CODE_SIGN_ENTITLEMENTS: GameHub/GameHub.entitlements
+      SWIFT_VERSION: "5.0"
