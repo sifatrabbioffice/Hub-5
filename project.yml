@@ -1,16 +1,18 @@
 name: GameHub
 options:
-  # এরর ফিক্স: পুরনো Xcode ভার্সনের জন্য ফরম্যাট কমানো হলো
-  xcodeVersion: "15.0" 
+  # এটি নিশ্চিত করবে যে প্রজেক্টটি Xcode 15 বা তার নিচের ভার্সনে ওপেন হবে
+  xcodeVersion: "15.0"
+  # অবজেক্ট ভার্সন ৫৬ বা তার নিচে রাখা নিরাপদ (৭৭ এর বদলে)
+  objectVersion: 56
   bundleIdPrefix: com.sifatrabbioffice
 targets:
   GameHub:
     type: application
     platform: iOS
-    # রানারের SDK 17.5 এর সাথে সামঞ্জস্যপূর্ণ করা হয়েছে
     deploymentTarget: "17.0"
     sources: [GameHub]
     settings:
       ENABLE_BITCODE: NO
+      # আপনার JIT এবং কন্ট্রোলার ফিচারের জন্য এন্টাইটেলমেন্টস পাথ
       CODE_SIGN_ENTITLEMENTS: GameHub/GameHub.entitlements
       SWIFT_VERSION: "5.0"
