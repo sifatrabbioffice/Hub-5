@@ -1,0 +1,67 @@
+name: Build GameHub IPA
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          # এরর ফিক্স: সোর্স ডিরেক্টরি না থাকলে তৈরি করে নেওয়া
+          mkdir -p GameHub
+          brew install xcodegen
+
+      - name: Create Project Spec
+        run: |
+          cat <<EOF > project.yml
+          name: GameHub
+          targets:
+            GameHub:
+              type: application
+              platform: iOS
+              deploymentTarget: "17.0"
+              sources: [GameHub]
+              settings:
+                ENABLE_BITCODE: NO
+                ENABLE_USER_SCRIPT_SANDBOXING: NO
+                CODE_SIGN_ENTITLEMENTS: GameHub/GameHub.entitlements
+          EOF
+
+      - name: Generate Entitlements
+        run: |
+          cat <<EOF > GameHub/GameHub.entitlements
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>dynamic-codesigning</key>
+              <true/>
+              <key>com.apple.developer.kernel.increased-memory-limit</key>
+              <true/>
+              <key>get-task-allow</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build and Export IPA
+        run: |
+          xcodebuild archive -project GameHub.xcodeproj \
+          -scheme GameHub -sdk iphoneos \
+          -archivePath GameHub.xcarchive \
+          CODE_SIGNING_ALLOWED=NO
+
+          mkdir -p Payload
+          cp -r GameHub.xcarchive/Products/Applications/GameHub.app Payload/
+          zip -r GameHub.ipa Payload
+          
+      - name: Upload Finished IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sifat-GameHub-Release
+          path: GameHub.ipa
