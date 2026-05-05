@@ -3,39 +3,47 @@ import SwiftUI
 struct DashboardView: View {
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // ড্যাশবোর্ড গ্রিড
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                        GameOptionBox(title: "Start Game", icon: "play.circle.fill", color: .green)
-                        GameOptionBox(title: "Library", icon: "square.grid.2x2.fill", color: .blue)
-                        GameOptionBox(title: "Cloud Gaming", icon: "cloud.rainbow.half.fill", color: .purple)
-                        GameOptionBox(title: "Settings", icon: "cpu.fill", color: .orange)
+            VStack {
+                // টপ সেকশন: JIT স্ট্যাটাস
+                HStack {
+                    Circle().fill(Color.green).frame(width: 10, height: 10)
+                    Text("64-bit Performance Engine Active").font(.caption2)
+                }.padding(.top)
+
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                        // লোকাল গেমিং (GTA V স্টাইল)
+                        NavigationLink(destination: Text("Local Engine Loading...")) {
+                            FeatureBox(title: "Local Play", icon: "desktopcomputer", color: .blue)
+                        }
+                        
+                        // ক্লাউড গেমিং (Xbox/PS)
+                        NavigationLink(destination: Text("Cloud Servers Online")) {
+                            FeatureBox(title: "Cloud Gaming", icon: "cloud.sun.fill", color: .purple)
+                        }
+                        
+                        // লাইব্রেরি ও সেটিংস
+                        FeatureBox(title: "Library", icon: "gamecontroller.fill", color: .green)
+                        FeatureBox(title: "Graphics Settings", icon: "bolt.fill", color: .orange)
                     }
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("GameHub Engine")
-            .toolbar {
-                Text("JIT Enabled").font(.caption).foregroundColor(.green)
-            }
+            .navigationTitle("Sifat's GameHub")
         }
     }
 }
 
-struct GameOptionBox: View {
-    let title: String
-    let icon: String
-    let color: Color
-    
+struct FeatureBox: View {
+    let title: String; let icon: String; let color: Color
     var body: some View {
         VStack {
-            Image(systemName: icon).font(.system(size: 45))
-            Text(title).bold()
+            Image(systemName: icon).font(.largeTitle).foregroundColor(.white)
+            Text(title).font(.system(size: 14, weight: .bold)).foregroundColor(.white)
         }
-        .frame(maxWidth: .infinity, minHeight: 160)
-        .background(color.opacity(0.1))
-        .cornerRadius(25)
-        .overlay(RoundedRectangle(cornerRadius: 25).stroke(color, lineWidth: 2))
+        .frame(maxWidth: .infinity, minHeight: 140)
+        .background(color.gradient)
+        .cornerRadius(20)
+        .shadow(radius: 5)
     }
 }
